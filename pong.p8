@@ -10,16 +10,21 @@ player_2 = {score=0, index=0, up=2, down=3}
 color = {dark_grey=5, white=7}
 sound = {bounce=0, point=1}
 key_launch = 4
+game_state = 0
 
--- --Runs at program start
--- function _init()
---  title_screen()
--- end
+--Runs at program start
+function _init()
+ title_screen()
+end
 
--- --The title screen
--- function title_screen()
---  print("PONG", 0, 0, color.white)
--- end
+--The title screen
+function title_screen()
+ print("PONG", 0, 0, color.white)
+ print("Press [shift] to start", 63, 63, color.white)
+ if btn(key_launch, player_1.index) then
+  game_state = 1
+ end
+end
 
 --Move the paddles
 function move_paddle()
@@ -120,13 +125,17 @@ end
 
 --Runs 30 times a second (30 fps)
 function _update()
- move_paddle()
- move_ball()
- collide_wall()
- collide_paddle(paddle_1)
- collide_paddle(paddle_2)
- return_ball()
- launch_ball()
+ if game_state == 0 then
+  _init()
+ elseif game_state == 1 then
+  move_paddle()
+  move_ball()
+  collide_wall()
+  collide_paddle(paddle_1)
+  collide_paddle(paddle_2)
+  return_ball()
+  launch_ball()
+ end
 end
 
 --Draws the objects on the screen
