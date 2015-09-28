@@ -10,124 +10,106 @@ player_2 = {score=0, index=0, up=2, down=3}
 color = {dark_grey=5, white=7}
 sound = {bounce=0, point=1}
 key_launch = 4
-game_state = 0
-
---Runs at program start
-function _init()
- title_screen()
-end
-
---The title screen
-function title_screen()
- print("PONG", 0, 0, color.white)
- print("Press [shift] to start", 63, 63, color.white)
- if btn(key_launch, player_1.index) then
-  game_state = 1
- end
-end
 
 --Move the paddles
 function move_paddle()
- if btn(player_1.up, player_1.index) then
-  if paddle_1.y >= 3 then
-   paddle_1.y -= 3
+  if btn(player_1.up, player_1.index) then
+    if paddle_1.y >= 3 then
+      paddle_1.y -= 3
+    end
+  elseif btn(player_1.down, player_1.index) then
+    if (paddle_1.y + paddle_2.h)<=124 then
+      paddle_1.y += 3
+    end
   end
- elseif btn(player_1.down, player_1.index) then
-  if (paddle_1.y + paddle_2.h)<=124 then
-   paddle_1.y += 3
+  if btn(player_2.up, player_2.index) then
+    if paddle_2.y >= 3 then
+      paddle_2.y -= 3
+    end
+  elseif btn(player_2.down, player_2.index) then
+    if (paddle_2.y + paddle_2.h)<=124 then
+      paddle_2.y += 3
+    end
   end
- end
- if btn(player_2.up, player_2.index) then
-  if paddle_2.y >= 3 then
-   paddle_2.y -= 3
-  end
- elseif btn(player_2.down, player_2.index) then
-  if (paddle_2.y + paddle_2.h)<=124 then
-   paddle_2.y += 3
-  end
- end
 end
 
 --Move the ball in the specified direction
 function move_ball()
- ball.x += ball.x_dir
- ball.y += ball.y_dir
+  ball.x += ball.x_dir
+  ball.y += ball.y_dir
 end
 
 --Collision detection for the walls
 function collide_wall()
- --top
- if ball.y < screen.y then
-  ball.y_dir =- ball.y_dir
-  sfx(sound.bounce)
- end
+  --top
+  if ball.y < screen.y then
+    ball.y_dir =- ball.y_dir
+    sfx(sound.bounce)
+  end
  
- --bottom
- if ball.y > (screen.y + screen.h) then
-  ball.y_dir = -ball.y_dir
-  sfx(sound.bounce)
- end
+  --bottom
+  if ball.y > (screen.y + screen.h) then
+    ball.y_dir = -ball.y_dir
+    sfx(sound.bounce)
+  end
 end
 
 --Collision dection for the paddles
 function collide_paddle(paddle)
- if ball.x >= paddle.x and
- ball.x <= (paddle.x + paddle.w) and
- ball.y >= paddle.y and
- ball.y <= (paddle.y + paddle.h) then
-  ball.x_dir = -ball.x_dir
-  sfx(sound.bounce)
- end
+  if ball.x >= paddle.x and
+  ball.x <= (paddle.x + paddle.w) and
+  ball.y >= paddle.y and
+  ball.y <= (paddle.y + paddle.h) then
+    ball.x_dir = -ball.x_dir
+    sfx(sound.bounce)
+  end
 end
 
 --Launches the ball in a random direction
 function launch_ball()
- if ball.moving == false and btnp(key_launch, player_1.index) then
- random_value = flr(rnd(4))
-  if random_value == 0 then
-    ball.x_dir = 2
-    ball.y_dir = 3
-  elseif random_value == 1 then
-    ball.x_dir = -2
-    ball.y_dir = 3
-  elseif random_value == 2 then
-    ball.x_dir = 2
-    ball.y_dir = -3
-  elseif random_value == 3 then
-    ball.x_dir = -2
-    ball.y_dir = -3
+  if ball.moving == false and btnp(key_launch, player_1.index) then
+    random_value = flr(rnd(4))
+      if random_value == 0 then
+        ball.x_dir = 2
+        ball.y_dir = 3
+      elseif random_value == 1 then
+        ball.x_dir = -2
+        ball.y_dir = 3
+      elseif random_value == 2 then
+        ball.x_dir = 2
+        ball.y_dir = -3
+      elseif random_value == 3 then
+        ball.x_dir = -2
+        ball.y_dir = -3
+      end
+    ball.moving = true
   end
-  ball.moving = true
- end
 end
 
 --Resets the ball and awards a point to the player who scored
 function return_ball()
- if ball.x > (screen.x + screen.w) then
-  reset_ball()
-  player_1.score += 1
-  sfx(sound.point)
- elseif ball.x < screen.x then
-  reset_ball()
-  player_2.score += 1
-  sfx(sound.point)
- end
+  if ball.x > (screen.x + screen.w) then
+    reset_ball()
+    player_1.score += 1
+    sfx(sound.point)
+  elseif ball.x < screen.x then
+    reset_ball()
+    player_2.score += 1
+    sfx(sound.point)
+  end
 end
 
 --Reset the balls position and movement
 function reset_ball()
- ball.x = 64
- ball.y = 64
- ball.x_dir = 0
- ball.y_dir = 0
- ball.moving = false
+  ball.x = 64
+  ball.y = 64
+  ball.x_dir = 0
+  ball.y_dir = 0
+  ball.moving = false
 end
 
 --Runs 30 times a second (30 fps)
 function _update()
- if game_state == 0 then
-  _init()
- elseif game_state == 1 then
   move_paddle()
   move_ball()
   collide_wall()
@@ -135,24 +117,23 @@ function _update()
   collide_paddle(paddle_2)
   return_ball()
   launch_ball()
- end
 end
 
 --Draws the objects on the screen
 function _draw()
- --clear the screen
- rectfill(screen.x, screen.y, screen.x+screen.w, screen.y+screen.h, color.dark_grey)
- --draw paddle 1
- rectfill(paddle_1.x, paddle_1.y, paddle_1.x+paddle_1.w, paddle_1.y+paddle_1.h,
+  --clear the screen
+  rectfill(screen.x, screen.y, screen.x+screen.w, screen.y+screen.h, color.dark_grey)
+  --draw paddle 1
+  rectfill(paddle_1.x, paddle_1.y, paddle_1.x+paddle_1.w, paddle_1.y+paddle_1.h,
   color.white)
- --draw paddle 2
- rectfill(paddle_2.x, paddle_2.y, paddle_2.x+paddle_2.w, paddle_2.y+paddle_2.h,
+  --draw paddle 2
+  rectfill(paddle_2.x, paddle_2.y, paddle_2.x+paddle_2.w, paddle_2.y+paddle_2.h,
   color.white)
- --draw the ball
- circfill(ball.x, ball.y, ball.size, color.white)
- --draw the scores
- print(player_1.score, 31, 1, color.white)
- print(player_2.score, 95, 1, color.white)
+  --draw the ball
+  circfill(ball.x, ball.y, ball.size, color.white)
+  --draw the scores
+  print(player_1.score, 31, 1, color.white)
+  print(player_2.score, 95, 1, color.white)
 end
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
