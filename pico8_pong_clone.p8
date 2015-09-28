@@ -1,6 +1,9 @@
 pico-8 cartridge // http://www.pico-8.com
 version 4
 __lua__
+--pico-8 pong clone
+--kurt osterhage
+
 paddle_1 = {x=0, y=52, w=3, h=24}
 paddle_2 = {x=124, y=52, w=3, h=24}
 ball = {x=64, y=64, size=2, x_dir=0, y_dir=0, moving=false}
